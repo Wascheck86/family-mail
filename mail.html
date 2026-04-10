@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:image" content="https://tvuj-username.github.io/nazev-repa/og-image.svg">
+  <meta property="og:title" content="Aktualizace kontaktů">
+  <meta property="og:description" content="Simple family directory app">
+
+  <title>Rodinný adresář</title>
+
+  <style>
+    :root {
+      --bg-color: #f0f4f8;
+      --card-bg: #ffffff;
+      --accent: #eb2563;
+      --accent-dark: #1e40af;
+      --accent-soft: rgba(37, 99, 235, 0.12);
+      --text-main: #0f172a;
+      --text-muted: #6b7280;
+      --border-soft: #e5e7eb;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.22);
+      --radius-lg: 24px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #020617;
+        --card-bg: #020617;
+        --accent-soft: rgba(96, 165, 250, 0.12);
+        --text-main: #e5e7eb;
+        --text-muted: #9ca3af;
+        --border-soft: #1f2937;
+        --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.7);
+      }
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, sans-serif;
+      background: radial-gradient(circle at top, rgba(148,163,184,0.35), transparent 55%), var(--bg-color);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+    }
+
+    .wrapper { width: 100%; max-width: 480px; }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(37,99,235,0.07), transparent 55%), var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 24px 20px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (max-width: 420px) {
+      .card { padding: 20px 16px 16px; }
+    }
+
+    .card-inner { position: relative; z-index: 1; }
+
+    /* ---------------- UVÍTACÍ OBRAZOVKA ---------------- */
+
+    #intro-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 9999;
+    }
+
+    #intro-box {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 26px 22px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: var(--shadow-soft);
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #intro-box h2 {
+      margin: 0 0 12px;
+      font-size: 1.6rem;
+      color: var(--accent-dark);
+    }
+
+    #intro-box p {
+      margin: 0 0 16px;
+      color: var(--text-muted);
+      line-height: 1.45;
+      font-size: 0.95rem;
+    }
+
+    #intro-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 999px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      box-shadow: 0 9px 18px rgba(37,99,235,0.35);
+    }
+
+    /* ---------------- FORMULÁŘ ---------------- */
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+
+    .welcome-block h2 {
+      margin: 0 0 6px;
+      font-size: 1.8rem;
+      color: #FFD700;
+      font-weight: 800;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-soft);
+      font-size: 1rem;
+      background: rgba(15,23,42,0.01);
+      color: inherit;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 999px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      box-shadow: 0 9px 18px rgba(37,99,235,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    /* LOADING BAR */
+    .bar {
+      width: 26px;
+      height: 4px;
+      border-radius: 2px;
+      background: white;
+      animation: barload 5s infinite ease-in-out;
+      display: none;
+    }
+
+    @keyframes barload {
+      0%   { transform: scaleX(0.4); background: white; opacity: 0.6; }
+      33%  { transform: scaleX(1);   background: #FFD700; opacity: 1; }
+      66%  { transform: scaleX(0.6); background: #eb2563; opacity: 0.9; }
+      100% { transform: scaleX(1);   background: white; opacity: 0.7; }
+    }
+
+    .final-screen {
+      text-align: center;
+      padding-top: 16px;
+      display: none;
+    }
+
+    .confetti-container {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 999;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 14px;
+      background: red;
+      opacity: 0.9;
+      border-radius: 2px;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-10vh) rotateZ(0deg); }
+      100% { transform: translateY(110vh) rotateZ(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ---------------- UVÍTACÍ OBRAZOVKA ---------------- -->
+
+  <div id="intro-screen">
+    <div id="intro-box">
+      <h2>O co se jedná?</h2>
+      <p>
+        Chci mít aktuální e‑maily, které opravdu používáte, protože je v budoucnu využije SOL — moje AI asistentka, kterou postupně učím pomáhat s rodinnou organizací a sdílením informací.
+      </p>
+      <p>
+        Nebojte, SOL nebude posílat spam (nevyžádané e‑maily). SOL bude časem posílat jen důležité zprávy týkající se rodiny, až to bude umět opravdu spolehlivě.
+      </p>
+      <p>
+        Do budoucna mi to výrazně ušetří čas. SOL se totiž učí používat i hlasové zadávání textu — třeba, když řeknu něco jako:<br>
+        <strong>„SOL, napiš zprávu bráchovi, že…“</strong><br>
+        a ona to sama sepíše a odešle přesně podle toho, co řeknu.
+      </p>
+      <p>
+        Aby to ale fungovalo, potřebuje mít asistentka správné a aktuální kontakty. Vybral jsem e‑mail záměrně, protože je to nejspolehlivější a nejuniverzálnější způsob komunikace. Každý ho má, funguje na všech zařízeních, neztratí se v záplavě zpráv a dá se na něj dlouhodobě spolehnout. 
+        <p>
+        A hlavně je zdarma — nemusím řešit žádné poplatky za SMS nebo jiné služby.
+        </p>
+      </p>
+      <p>A proč další dotazník? Jsou to upravdu jen dvě pole, v původním dotazníku jsem na tuto položku úplně zapomněl.
+      </p>
+
+      <p style="margin-top: 20px; font-weight: 600; color: goldenrod; font-size: 2.05rem; text-align: right;">
+  <i>Děkuji</i>
+</p>
+
+
+
+      <button id="intro-btn">Pokračovat na vyplnění</button>
+    </div>
+  </div>
+
+  <!-- ---------------- FORMULÁŘ ---------------- -->
+
+  <div class="wrapper" id="form-wrapper" style="display:none;">
+    <div class="card">
+      <div class="card-inner">
+
+        <div id="form-screen">
+          <div class="header">
+            <div class="avatar">📧</div>
+            <div class="header-text">
+              <h1>Aktualizace kontaktů</h1>
+              <p>Prosím vyplňte své údaje</p>
+            </div>
+          </div>
+
+          <form id="contactForm">
+            <label>Jméno</label>
+            <input type="text" id="name" required>
+
+            <label>E‑mail</label>
+            <input type="email" id="email" required>
+
+            <button type="submit" class="btn" id="submitBtn">
+              <span id="btnText">Odeslat</span>
+              <div class="bar" id="spinner"></div>
+            </button>
+          </form>
+        </div>
+
+        <div id="final-screen" class="final-screen">
+          <h2>Hotovo 🎉</h2>
+          <p>Děkujeme, kontakt je uložen.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="confetti-container" id="confetti"></div>
+
+  <script>
+    // Intro screen
+    document.getElementById("intro-btn").addEventListener("click", () => {
+      document.getElementById("intro-screen").style.display = "none";
+      document.getElementById("form-wrapper").style.display = "block";
+    });
+
+    // Form logic
+    const form = document.getElementById("contactForm");
+    const formScreen = document.getElementById("form-screen");
+    const finalScreen = document.getElementById("final-screen");
+    const submitBtn = document.getElementById("submitBtn");
+    const spinner = document.getElementById("spinner");
+    const btnText = document.getElementById("btnText");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      submitBtn.disabled = true;
+      spinner.style.display = "block";
+      btnText.textContent = "Odesílám…";
+
+      const payload = {
+        _format: "plain",
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        timestamp: new Date().toISOString(),
+        _subject: "Nový kontakt z rodinného formuláře"
+      };
+
+      try {
+        const response = await fetch("https://formspree.io/f/xgopqzbo", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json; charset=UTF-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          formScreen.style.display = "none";
+          finalScreen.style.display = "block";
+          spawnConfetti();
+        } else {
+          btnText.textContent = "Chyba při odesílání";
+          spinner.style.display = "none";
+        }
+      } catch (err) {
+        btnText.textContent = "Chyba připojení";
+        spinner.style.display = "none";
+      }
+    });
+
+    function spawnConfetti() {
+      const container = document.getElementById("confetti");
+      const colors = ["#eb2563", "#FFD700", "#1e40af", "#34d399", "#f87171"];
+
+      for (let i = 0; i < 80; i++) {
+        const piece = document.createElement("div");
+        piece.classList.add("confetti");
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = 2 + Math.random() * 2 + "s";
+        piece.style.opacity = 0.7 + Math.random() * 0.3;
+        container.appendChild(piece);
+
+        setTimeout(() => piece.remove(), 4000);
+      }
+    }
+  </script>
+
+</body>
+</html>
