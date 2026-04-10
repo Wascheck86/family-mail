@@ -67,17 +67,20 @@
     /* ---------------- UVÍTACÍ OBRAZOVKA ---------------- */
 
     #intro-screen {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 9999;
-      overflow-y: auto;
-    }
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    padding-top: 40px;
+    z-index: 9999;
+    overflow-y: auto;
+}
+
 
     #intro-box {
       background: var(--card-bg);
@@ -230,6 +233,47 @@
       0% { transform: translateY(-10vh) rotateZ(0deg); }
       100% { transform: translateY(110vh) rotateZ(360deg); }
     }
+
+    @media (max-width: 600px) {
+
+    #intro-screen {
+        padding: 16px;
+        padding-top: 24px;
+    }
+
+    #intro-box {
+        padding: 20px 18px;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 16px;
+    }
+
+    #intro-box h2 {
+        font-size: 1.4rem;
+        line-height: 1.3;
+    }
+
+    #intro-box p {
+        font-size: 1rem;
+        line-height: 1.55;
+        margin-bottom: 1.1rem;
+    }
+
+    #intro-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.1rem;
+    }
+
+    body {
+        padding: 12px;
+    }
+
+    .card {
+        padding: 20px 16px;
+    }
+}
+
   </style>
 </head>
 
